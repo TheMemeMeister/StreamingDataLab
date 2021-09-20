@@ -48,7 +48,7 @@ public partial class PartyCharacter
     public int wisdom;
 
     public LinkedList<int> equipment;
-
+    //public LinkedList<int> affliction;
 }
 
 
@@ -72,7 +72,8 @@ public partial class PartyCharacter
 
 static public class AssignmentPart1
 {
-
+    const int PartyCharacterSaveDataSignifier = 0;
+    const int EquipmentSaveDataSignifier = 1;
     static public void SavePartyButtonPressed()
     {
         StreamWriter sw = new StreamWriter(Application.dataPath + Path.DirectorySeparatorChar + "Party.txt");
@@ -81,8 +82,14 @@ static public class AssignmentPart1
             Debug.Log("PC class id == " + pc.classID);
             //sw.WriteLine("PC class id == " + pc.classID);
 
-                sw.WriteLine(pc.classID + "," + pc.health + ",", +pc.mana
+                sw.WriteLine(PartyCharacterSaveDataSignifier + "," + pc.classID + "," + pc.health + "," +pc.mana //0 = character stats
                     + "," + pc.strength + "," + pc.agility + "," + pc.wisdom);
+
+        foreach(int equipID in pc.equipment)
+            {
+                sw.WriteLine(EquipmentSaveDataSignifier + "," + equipID);
+
+            }
                
         }
 
@@ -107,9 +114,19 @@ static public class AssignmentPart1
             Debug.Log(line);
             string[] csv = line.Split(','); //splitting the lines by the commans, hence csv
             Debug.Log(csv[0]); //double checking csv
+            int saveDataSignifier = int.Parse(csv[0]);
 
-          PartyCharacter pc = new PartyCharacter(int.Parse(csv[0]), int.Parse(csv[1]), int.Parse(csv[2]), int.Parse(csv[3]), int.Parse(csv[4]), int.Parse(csv[5]));
-          GameContent.partyCharacters.AddLast(pc);
+            if (saveDataSignifier == PartyCharacterSaveDataSignifier) //it is new character
+            {
+                PartyCharacter pc = new PartyCharacter(int.Parse(csv[1]), int.Parse(csv[2]), int.Parse(csv[3]), int.Parse(csv[4]), int.Parse(csv[5]), int.Parse(csv[6]));
+                GameContent.partyCharacters.AddLast(pc);
+            }
+            else if (saveDataSignifier == EquipmentSaveDataSignifier)
+            {
+                GameContent.partyCharacters.Last.Value.equipment.AddLast(int.Parse(csv[1]));
+            }
+
+
         }
       
         GameContent.RefreshUI();
